@@ -1,38 +1,26 @@
-package io.github.crazygoatstudio.mambodroid;
+package example.myapplication;
 
 //General imports
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Handler;
-import android.os.IBinder;
 import android.speech.RecognizerIntent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 //Drone imports
 import com.parrot.arsdk.arcommands.ARCOMMANDS_MINIDRONE_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
-import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
-import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 
 //Eneter imports
 import eneter.messaging.diagnostic.EneterTrace;
@@ -40,8 +28,9 @@ import eneter.messaging.endpoints.typedmessages.*;
 import eneter.messaging.messagingsystems.messagingsystembase.*;
 import eneter.messaging.messagingsystems.tcpmessagingsystem.TcpMessagingSystemFactory;
 import eneter.net.system.EventHandler;
+import io.github.crazygoatstudio.mambodroid.R;
 
-import static io.github.crazygoatstudio.mambodroid.UtilsKt.rangeAngle;
+import static example.myapplication.UtilsKt.rangeAngle;
 
 
 public class MainActivity extends AppCompatActivity {

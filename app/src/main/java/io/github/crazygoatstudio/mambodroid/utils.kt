@@ -1,4 +1,4 @@
-package io.github.crazygoatstudio.mambodroid
+package example.myapplication
 
 /**
  * Created by xaviermarrib on 01/06/2017.

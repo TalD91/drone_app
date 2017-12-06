@@ -1,4 +1,4 @@
-package io.github.crazygoatstudio.mambodroid;
+package example.myapplication;
 
 
 import android.content.ComponentName;

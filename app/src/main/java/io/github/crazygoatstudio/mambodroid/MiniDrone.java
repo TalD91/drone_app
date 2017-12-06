@@ -1,4 +1,4 @@
-package io.github.crazygoatstudio.mambodroid;
+package example.myapplication;
 
 
 import android.content.Context;
@@ -25,9 +25,6 @@ import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceBLEService;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryException;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
-import com.parrot.arsdk.arsal.ARSALBLEManager;
-import com.parrot.arsdk.arutils.ARUtilsException;
-import com.parrot.arsdk.arutils.ARUtilsManager;
 
 import java.util.ArrayList;
 import java.util.List;

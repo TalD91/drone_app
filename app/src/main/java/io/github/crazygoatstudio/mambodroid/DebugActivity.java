@@ -1,4 +1,4 @@
-package io.github.crazygoatstudio.mambodroid;
+package example.myapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,14 +7,14 @@ import eneter.messaging.endpoints.typedmessages.*;
 import eneter.messaging.messagingsystems.messagingsystembase.*;
 import eneter.messaging.messagingsystems.tcpmessagingsystem.TcpMessagingSystemFactory;
 import eneter.net.system.EventHandler;
-import android.app.Activity;
-import android.os.Bundle;
+import io.github.crazygoatstudio.mambodroid.R;
+
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-import static io.github.crazygoatstudio.mambodroid.UtilsKt.rangeAngle;
+import static example.myapplication.UtilsKt.rangeAngle;
 
 public class DebugActivity extends AppCompatActivity {
     // Request message type
@@ -56,7 +56,7 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_debug);
+        setContentView(R.layout.connect_drone);
         // Get UI widgets.
         myMessageTextEditText = (EditText) findViewById(R.id.messageTextEditText);
         myResponseEditText = (EditText) findViewById(R.id.messageLengthEditText);
