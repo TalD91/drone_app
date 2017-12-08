@@ -37,7 +37,7 @@ import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpda
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Vector;
 
 
 public class DeviceListActivity extends AppCompatActivity {
@@ -45,12 +45,10 @@ public class DeviceListActivity extends AppCompatActivity {
     private static final String TAG = "DeviceListActivity";
 
     // BLE / Drone components
-    private ARDiscoveryService mArdiscoveryService;
-    private ServiceConnection mArdiscoveryServiceConnection;
     public DroneDiscoverer mDroneDiscoverer;
     BluetoothAdapter BT_adapter = BluetoothAdapter.getDefaultAdapter();
     private ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
-    private final List<ARDiscoveryDeviceService> mDronesList = new ArrayList<>();
+   // private final List<ARDiscoveryDeviceService> mDronesList = new ArrayList<>();
 
     List<ARDiscoveryDeviceService> deviceList;
 
@@ -62,9 +60,10 @@ public class DeviceListActivity extends AppCompatActivity {
 
     // GUI components
     private Button btn_on_off;
-    private Button btn_discover;
     private ListView drone_list;
-    private Button stop_btn;
+    private Button refresh_btn;
+
+
 
     //runtime components
     private boolean stop_btn_clicked = false;
@@ -79,9 +78,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
         // init GUI components
         btn_on_off = (Button) findViewById(R.id.power_btn);
-        btn_discover = (Button) findViewById(R.id.discover_btn);
         drone_list = (ListView) findViewById(R.id.drone_discovered_list);
-        stop_btn = (Button) findViewById(R.id.stop_btn);
 
 
         BT_adapter = BluetoothAdapter.getDefaultAdapter();
@@ -91,35 +88,29 @@ public class DeviceListActivity extends AppCompatActivity {
                 Enable_disable_BT();
             }
         });
-        btn_discover.setOnClickListener(new View.OnClickListener() {
+        final Vector<String> names = new Vector<>();
+
+        final ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(),  android.R.layout.simple_list_item_1, names);
+        drone_list.setAdapter(adapter);
+        mDroneDiscoverer = new DroneDiscoverer(getApplicationContext());
+        mDroneDiscoverer.setup();
+
+
+        refresh_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Discover_drones();
+                mDroneDiscoverer.startDiscovering();
             }
         });
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(),  android.R.layout.simple_list_item_1, mDronesList);
-                drone_list.setAdapter(adapter);
-                while (!stop_btn_clicked) {
-                    adapter.notifyDataSetChanged();
-                    try {Thread.currentThread().sleep(10000);}
-                    catch (InterruptedException e) {}
-                }
-            }
-        });
-        t.start();
-        stop_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stop_btn_clicked = true;
-            }
-        });
+
 
     }
 
+    private void wait30sec () {
+        long time = System.currentTimeMillis()+11000;
+        while(System.currentTimeMillis() < time) {}
+    }
     // Method to enable / disable BT
     private void Enable_disable_BT() {
         if (BT_adapter != null) {
@@ -140,195 +131,4 @@ public class DeviceListActivity extends AppCompatActivity {
             t.show();
         }
     }
-
-    private void Discover_drones() {
-        initDiscoveryService();
-        startDiscovery();
-    }
-
-
-
-    private void initDiscoveryService()
-    {
-
-        // create the service connection
-        if (mArdiscoveryServiceConnection == null)
-        {
-            mArdiscoveryServiceConnection = new ServiceConnection()
-            {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service)
-                {
-                    mArdiscoveryService = ((ARDiscoveryService.LocalBinder) service).getService();
-
-                    startDiscovery();
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name)
-                {
-                    mArdiscoveryService = null;
-                }
-            };
-        }
-
-        if (mArdiscoveryService == null)
-        {
-            // if the discovery service doesn't exists, bind to it
-            Intent i = new Intent(getApplicationContext(), ARDiscoveryService.class);
-            getApplicationContext().bindService(i, mArdiscoveryServiceConnection, getApplicationContext().BIND_AUTO_CREATE);
-        }
-        else
-        {
-            // if the discovery service already exists, start discovery
-            startDiscovery();
-        }
-    }
-
-    private void startDiscovery()
-    {
-        if (mArdiscoveryService != null)
-        {
-            mArdiscoveryService.start();
-        }
-    }
-
-
-    private void registerReceivers()
-    {
-        receiver =
-                new ARDiscoveryServicesDevicesListUpdatedReceiver(mDiscoveryDelegate);
-        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
-        localBroadcastMgr.registerReceiver(receiver,
-                new IntentFilter(ARDiscoveryService.kARDiscoveryServiceNotificationServicesDevicesListUpdated));
-    }
-
-    private final ARDiscoveryServicesDevicesListUpdatedReceiverDelegate mDiscoveryDelegate =
-            new ARDiscoveryServicesDevicesListUpdatedReceiverDelegate() {
-
-                @Override
-                public void onServicesDevicesListUpdated() {
-                    if (mArdiscoveryService != null) {
-                        deviceList = mArdiscoveryService.getDeviceServicesArray();
-                    }
-                }
-            };
-
-    private ARDiscoveryDevice createDiscoveryDevice(@NonNull ARDiscoveryDeviceService service) {
-        ARDiscoveryDevice device = null;
-        try {
-            device = new ARDiscoveryDevice(getApplicationContext(), service);
-        } catch (ARDiscoveryException e) {
-            Log.e(TAG, "Exception", e);
-        }
-
-        return device;
-    }
-    private void unregisterReceivers()
-    {
-        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
-
-        localBroadcastMgr.unregisterReceiver(receiver);
-    }
-
-    private void closeServices()
-    {
-        Log.d(TAG, "closeServices ...");
-
-        if (mArdiscoveryService != null)
-        {
-            new Thread(new Runnable() {
-                @Override
-                public void run()
-                {
-                    mArdiscoveryService.stop();
-
-                    getApplicationContext().unbindService(mArdiscoveryServiceConnection);
-                    mArdiscoveryService = null;
-                }
-            }).start();
-        }
-    }
- /*   @Override
-    protected void onResume()
-    {
-        super.onResume();
-
-        // setup the drone discoverer and register as listener
-        mDroneDiscoverer.setup();
-        mDroneDiscoverer.addListener(mDiscovererListener);
-
-        // start discovering
-        mDroneDiscoverer.startDiscovering();
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-
-        // clean the drone discoverer object
-        mDroneDiscoverer.stopDiscovering();
-        mDroneDiscoverer.cleanup();
-        mDroneDiscoverer.removeListener(mDiscovererListener);
-    }
-*/
-    private final DroneDiscoverer.Listener mDiscovererListener = new  DroneDiscoverer.Listener() {
-
-        @Override
-        public void onDronesListUpdated(List<ARDiscoveryDeviceService> dronesList) {
-            mDronesList.clear();
-            mDronesList.addAll(dronesList);
-
-            mAdapter.notifyDataSetChanged();
-        }
-    };
-
-    static class ViewHolder {
-        public TextView text;
-    }
-
-    private final BaseAdapter mAdapter = new BaseAdapter()
-    {
-        @Override
-        public int getCount()
-        {
-            return mDronesList.size();
-        }
-
-        @Override
-        public Object getItem(int position)
-        {
-            return mDronesList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position)
-        {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View rowView = convertView;
-            // reuse views
-            if (rowView == null) {
-                LayoutInflater inflater = getLayoutInflater();
-                rowView = inflater.inflate(android.R.layout.simple_list_item_1, null);
-                // configure view holder
-                ViewHolder viewHolder = new ViewHolder();
-                viewHolder.text = (TextView) rowView.findViewById(android.R.id.text1);
-                rowView.setTag(viewHolder);
-            }
-
-            // fill data
-            ViewHolder holder = (ViewHolder) rowView.getTag();
-            ARDiscoveryDeviceService service = (ARDiscoveryDeviceService)getItem(position);
-            holder.text.setText(service.getName());
-
-            return rowView;
-        }
-    };
-
 }

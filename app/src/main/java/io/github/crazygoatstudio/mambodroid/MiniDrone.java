@@ -1,4 +1,4 @@
-package example.myapplication;
+package io.github.crazygoatstudio.mambodroid;
 
 
 import android.content.Context;

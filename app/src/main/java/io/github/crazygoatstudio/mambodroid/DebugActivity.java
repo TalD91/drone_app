@@ -1,4 +1,3 @@
-package example.myapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -56,7 +55,7 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.connect_drone);
+        setContentView(R.layout.activity_debug);
         // Get UI widgets.
         myMessageTextEditText = (EditText) findViewById(R.id.messageTextEditText);
         myResponseEditText = (EditText) findViewById(R.id.messageLengthEditText);
